@@ -1,20 +1,19 @@
 var express = require('express');
 const connection = require('./../inc/db');
 var conn = require("./../inc/db")
+var menus = require("./../inc/menus")
 var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  conn.query("SELECT * FROM tb_menus ORDER BY title", (err, result)=>{
-    if(err){
-      console.error(err)
-    }else{
-      console.log(result)
-      res.render("index", {
-        title: 'Restaurante Saboroso',
-        menus: result
-      })
-    }
+  menus.getMenus().then(result=>{
+    res.render("index", {
+      title: 'Restaurante Saboroso',
+      menus: result,
+      isHome: true
+    })
+  }).catch(e=>{
+    console.log(e)
   })
 });
 
@@ -27,10 +26,16 @@ router.get('/contacts', function(req, res, next) {
 });
 
 router.get('/menus', function(req, res, next) {
-  res.render("menus", {
-    title: 'Menus - Restaurante Saboroso',
-    background: "images/img_bg_1.jpg",
-    h1: "Saboreie nosso menu!"
+  menus.getMenus().then(result=>{
+    console.log(result)
+    res.render("menus", {
+      title: 'Menus - Restaurante Saboroso',
+      background: "images/img_bg_1.jpg",
+      h1: "Saboreie nosso menu!",
+      menus: result
+    })
+  }).catch(e=>{
+    console.log(e)
   })
 });
 
