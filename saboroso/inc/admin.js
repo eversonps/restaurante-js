@@ -1,9 +1,16 @@
 module.exports = {
-    getMenus(){
-        return [
+    getParams(req, params){
+        return Object.assign({}, {
+            menus: req.menus,
+            user: req.session.user
+        }, params)
+    },
+
+    getMenus(req){
+        let menus = [
             {
                 text: "Tela Inicial",
-                href: "/",
+                href: "/admin/",
                 icon: "home",
                 active: false
             },
@@ -38,5 +45,11 @@ module.exports = {
                 active: false
             }
         ]
+
+        menus.map(menu => {
+            if(menu.href === `/admin${req.url}`) menu.active = true
+        })
+
+        return menus
     }
 }
