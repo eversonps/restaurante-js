@@ -3,6 +3,7 @@ var router = express.Router()
 var users = require("./../inc/users")
 var admin = require("./../inc/admin")
 var menus = require("./../inc/menus")
+var reservations = require("./../inc/reservation")
 
 router.use((req, res, next)=>{
     if(["/login"].indexOf(req.url) == -1 && !req.session.user){
@@ -59,14 +60,6 @@ router.get("/emails", function(req, res, next){
     res.render("admin/emails", admin.getParams(req))
 })
 
-router.post("/menus", function(req, res, next){
-    menus.save(req.fields, req.files).then(result=>{
-        res.send(result)
-    }).catch(e=>{
-        console.error(e)
-    })
-})
-
 router.get("/menus", function(req, res, next){
     menus.getMenus().then(data=>{
         res.render("admin/menus", admin.getParams(req, {
@@ -77,10 +70,16 @@ router.get("/menus", function(req, res, next){
     })
 })
 
+router.post("/menus", function(req, res, next){
+    menus.save(req.fields, req.files).then(result=>{
+        res.send(result)
+    }).catch(e=>{
+        console.error(e)
+    })
+})
+
 router.delete("/menus/:id", function(req, res, next){
-    console.log("entrou")
-    console.log(req.params.id)
-    menus.delete(req.params.id).then(result=>{
+    reservations.delete(req.params.id).then(result=>{
         res.send(result)
     }).catch(err=>{
         console.error(err)
@@ -91,6 +90,23 @@ router.delete("/menus/:id", function(req, res, next){
 router.get("/reservations", function(req, res, next){
     res.render("admin/reservations", admin.getParams(req, { date: {}}))
 })
+
+router.post("/reservations", function(req, res, next){
+    reservations.save(req.fields, req.files).then(result=>{
+        res.send(result)
+    }).catch(e=>{
+        console.error(e)
+    })
+})
+
+router.delete("/reservations/:id", function(req, res, next){
+    reservations.delete(req.params.id).then(result=>{
+        res.send(result)
+    }).catch(err=>{
+        console.error(err)
+    })
+})
+
 
 router.get("/users", function(req, res, next){
     res.render("admin/users", admin.getParams(req))

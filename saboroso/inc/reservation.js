@@ -13,16 +13,29 @@ module.exports = {
     },
 
     save(fields){
-        fields.date = fields.date.split('/').reverse().join('-');
+
+        if(fields.date.indexOf("/") > -1){
+            fields.date = fields.date.split('/').reverse().join('-');
+        }
+        
+
+        let query, params = [
+            fields.name,
+            fields.email,
+            fields.people,
+            fields.date,
+            fields.time
+        ]
+
+        if(parseInt(fields.id) > 0){
+            query = "UPDATE tb_reservations SET name = ?, email = ?, people = ?, date = ?, time = ? WHERE id = ?"
+            params.push(fields.id)
+        }else{
+            query = "INSERT INTO tb_reservations (name, email, people, date, time) VALUES (?, ?, ?, ?, ?)"
+        }
 
         return new Promise((s,f)=>{
-            conn.query("INSERT INTO tb_reservations (name, email, people, date, time) VALUES (?, ?, ?, ?, ?)", [
-                fields.name,
-                fields.email,
-                fields.people,
-                fields.date,
-                fields.time
-            ], (err, result)=>{
+            conn.query(query, params, (err, result)=>{
                 if(err){
                     f(err)
                 }else{
