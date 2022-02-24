@@ -44,7 +44,7 @@
                   <td> <%= row.title %> </td>
                   <td><%= row.description %> </td>
                   <td><%= row.price %> </td>
-                  <td><button type="button" class="btn btn-xs btn-info btn-update" data-toggle="modal" data-target="#modal-update"><i
+                  <td><button type="button" class="btn btn-xs btn-info btn-update"><i
                         class="fa fa-pencil"></i> Editar</button>&nbsp;<button type="button" class="btn btn-xs btn-danger btn-delete"><i
                         class="fa fa-trash"></i> Excluir</button></td>
                 </tr>
@@ -142,3 +142,54 @@
     </div>
 
 <%- include("inc/footer")-%>
+
+<script src="/js/hcode-filereader.js"></script>
+
+<script>   
+  new HcodeFileReader("#modal-create [type=file]", "#modal-create img")
+  let formCreate = document.querySelector("#modal-create form")
+  formCreate.addEventListener("submit", e=>{
+    console.log("entrou")
+    e.preventDefault()
+    let formCreateDate = new FormData(formCreate)
+    console.log(formCreate)
+
+    fetch("/admin/menus", {
+      method: "POST",
+      body: formCreateDate
+    }).then(response=>{
+      response.json()
+    }).then(json=>{
+      window.location.reload()
+    })
+  })
+  
+  let formUpdate = document.querySelector("#modal-update form");
+
+  [...document.querySelectorAll(".btn-update")].forEach(btn=>{
+    btn.addEventListener("click", e=>{
+
+      let tr = e.composedPath().find(el=>{
+        return (el.tagName.toUpperCase() === "TR")
+      })
+
+      let data = JSON.parse(tr.dataset.row)
+      console.log(data)
+
+      for(let name in data){
+        switch(name){
+          case "photo":
+          break
+
+          default:
+            let input = formUpdate.querySelector(`[name=${name}]`)
+            if(input) input.value = data[name]
+            break
+        }
+      }
+
+      $("#modal-update").modal("show")
+
+    })    
+  })
+</script>

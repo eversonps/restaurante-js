@@ -12,5 +12,22 @@ module.exports = {
                 }
             })
         })
+    },
+
+    save(fields, files){
+      return new Promise((s, f)=>{
+        conn.query("INSERT INTO tb_menus(title, description, price, photo) VALUES (?, ?, ?, ?)", [
+          fields.title,
+          fields.description,
+          fields.price,
+          `images/${files.photo.name}`
+        ], (err, result)=>{
+          if(err){
+            f(err)
+          }else{
+            s(result)
+          }
+        })
+      })
     }
 }

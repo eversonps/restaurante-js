@@ -59,6 +59,14 @@ router.get("/emails", function(req, res, next){
     res.render("admin/emails", admin.getParams(req))
 })
 
+router.post("/menus", function(req, res, next){
+    menus.save(req.fields, req.files).then(result=>{
+        res.send(result)
+    }).catch(e=>{
+        console.error(e)
+    })
+})
+
 router.get("/menus", function(req, res, next){
     menus.getMenus().then(data=>{
         res.render("admin/menus", admin.getParams(req, {
