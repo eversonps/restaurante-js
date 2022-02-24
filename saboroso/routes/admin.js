@@ -75,8 +75,18 @@ router.get("/menus", function(req, res, next){
     }).catch(err=>{
         console.error(err)
     })
-    
 })
+
+router.delete("/menus/:id", function(req, res, next){
+    console.log("entrou")
+    console.log(req.params.id)
+    menus.delete(req.params.id).then(result=>{
+        res.send(result)
+    }).catch(err=>{
+        console.error(err)
+    })
+})
+
 
 router.get("/reservations", function(req, res, next){
     res.render("admin/reservations", admin.getParams(req, { date: {}}))
