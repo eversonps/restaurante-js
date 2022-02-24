@@ -16,12 +16,29 @@ module.exports = {
 
     save(fields, files){
       return new Promise((s, f)=>{
-        conn.query("INSERT INTO tb_menus(title, description, price, photo) VALUES (?, ?, ?, ?)", [
+        let query, queryPhoto = "", params = [
           fields.title,
           fields.description,
-          fields.price,
-          `images/${files.photo.name}`
-        ], (err, result)=>{
+          fields.price
+        ]
+
+        if(files.photo.name){
+          queryPhoto = ", photo = ?"
+          params.push(`images/${files.photo.name}`)
+        }
+
+        if(parseInt(fields.id) > 0){
+          params.push(fields.id)
+          query = `UPDATE tb_menus SET title = ?, description = ?, price = ? ${queryPhoto} WHERE id = ?`
+        }else{
+          if(!files.photo.name){
+            f("Envie a foto do prato.")
+          }
+
+          query = "INSERT INTO tb_menus(title, description, price, photo) VALUES (?, ?, ?, ?)"
+        }
+        
+        conn.query(query, params, (err, result)=>{
           if(err){
             f(err)
           }else{
