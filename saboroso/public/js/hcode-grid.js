@@ -3,7 +3,7 @@ class HcodeGrid{
 
       configs.listeners = Object.assign({ 
         afterUpdateClick: (e)=>{
-          $("#modal-update").modal("show")
+          $(this.formUpdate).modal("show")
         },
 
         afterDeleteClick: (e)=>{
@@ -33,7 +33,15 @@ class HcodeGrid{
         formUpdate: "#modal-update form",
         btnUpdate: ".btn-update",
         btnDelete: ".btn-delete",
+        onUpdateLoad: (form, name, data) =>{
+          if(name != "password" && name != "register"){
+            let input = form.querySelector(`[name=${name}]`)
+            input.value = data[name]
+          }
+        }
       }, configs)
+
+      this.rows = [...document.querySelectorAll("table tbody tr")]
 
       this.initForms()
       this.initButtons()
@@ -50,6 +58,7 @@ class HcodeGrid{
         return (el.tagName.toUpperCase() === "TR")
       })
 
+      console.log(tr.dataset.row)
       return JSON.parse(tr.dataset.row)
     }
 
@@ -94,7 +103,7 @@ class HcodeGrid{
           btn.addEventListener("click", e=>{
             this.fireEvent("beforeUpdateClick", [e])
             let data = this.getTrData(e)
-      
+            console.log(data)
             for(let name in data){
               this.options.onUpdateLoad(this.formUpdate, name, data)
             }
