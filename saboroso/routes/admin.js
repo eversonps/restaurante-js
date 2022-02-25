@@ -55,7 +55,27 @@ router.get("/login", function(req, res, next){
 })
 
 router.get("/contacts", function(req, res, next){
-    res.render("admin/contacts", admin.getParams(req))
+    contacts.getContacts().then(data=>{
+        res.render("admin/contacts", admin.getParams(req, {
+            data
+        }))
+    })
+})
+
+router.post("/contacts", function(req, res, next){
+    contacts.getContacts().then(data=>{
+        res.render("admin/contacts", admin.getParams(req, {
+            data
+        }))
+    })
+})
+
+router.delete("/contacts/:id", function(req, res, next){
+    contacts.delete(req.params.id).then(results=>{
+        res.send(results)
+    }).catch(e=>{
+        console.error(e)
+    })
 })
 
 router.get("/emails", function(req, res, next){

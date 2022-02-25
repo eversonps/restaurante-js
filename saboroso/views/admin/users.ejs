@@ -163,7 +163,12 @@
 <script>
   new HcodeGrid({
     deleteUrl: "/admin/users/${data.id}",
-    deleteMsg: "Deseja excluir o usuário ${data.name}"
+    deleteMsg: "Deseja excluir o usuário ${data.name}",
+    listeners: {
+      buttonClick: (btn, data, e)=>{
+        console.log("buttonclick", btn, data, e)
+      }
+    }
   })
 
 </script>

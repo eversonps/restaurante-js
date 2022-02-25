@@ -31,8 +31,8 @@ class HcodeGrid{
       this.options = Object.assign({}, {    
         formCreate: "#modal-create form",
         formUpdate: "#modal-update form",
-        btnUpdate: ".btn-update",
-        btnDelete: ".btn-delete",
+        btnUpdate: "btn-update",
+        btnDelete: "btn-delete",
         onUpdateLoad: (form, name, data) =>{
           if(name != "password" && name != "register"){
             let input = form.querySelector(`[name=${name}]`)
@@ -79,37 +79,50 @@ class HcodeGrid{
         });
     }
 
+    btnUpdateClick(e){
+          this.fireEvent("beforeUpdateClick", [e])
+          let data = this.getTrData(e)
+          console.log(data)
+          for(let name in data){
+            this.options.onUpdateLoad(this.formUpdate, name, data)
+          }
+    
+          this.fireEvent("afterUpdateClick", [e])
+    }
+
+    btnDeleteClick(e){
+          this.fireEvent("beforeDeleteClick")
+
+          let data = this.getTrData(e)
+
+          if(confirm(eval("`" + this.options.deleteMsg + "`"))){
+            fetch(eval("`" + this.options.deleteUrl + "`"), {
+                method: "DELETE"
+            }).then(response=>{
+                response.json()
+            }).then(json=>{
+              console.log("deu certo!")
+              this.fireEvent("afterDeleteClick")
+            })
+          }
+    }
+
     initButtons(){
-        [...document.querySelectorAll(this.options.btnDelete)].forEach(btn=>{
+      this.rows.forEach(row=>{
+        [...row.querySelectorAll(".btn")].forEach(btn=>{
           btn.addEventListener("click", e=>{
-            this.fireEvent("beforeDeleteClick")
+            
 
-            let data = this.getTrData(e)
-
-            if(confirm(eval("`" + this.options.deleteMsg + "`"))){
-              fetch(eval("`" + this.options.deleteUrl + "`"), {
-                  method: "DELETE"
-              }).then(response=>{
-                  response.json()
-              }).then(json=>{
-                console.log("deu certo!")
-                this.fireEvent("afterDeleteClick")
-              })
+            if(e.target.classList.contains(this.options.btnUpdate)){
+              this.btnUpdateClick(e)
+            } else if(e.target.classList.contains(this.options.btnDelete)){
+              this.btnDeleteClick(e)
+            }else{
+              console.log("entrou")
+              this.fireEvent("buttonClick", [e.target, this.getTrData(e), e])
             }
           })
-        });
-      
-        [...document.querySelectorAll(this.options.btnUpdate)].forEach(btn=>{   
-          btn.addEventListener("click", e=>{
-            this.fireEvent("beforeUpdateClick", [e])
-            let data = this.getTrData(e)
-            console.log(data)
-            for(let name in data){
-              this.options.onUpdateLoad(this.formUpdate, name, data)
-            }
-      
-            this.fireEvent("afterUpdateClick", [e])
-          })    
         })
+      });
     }
 }

@@ -27,5 +27,34 @@ module.exports = {
                 }
             })
         })
-    }
+    },
+
+    getMenus(){
+        return new Promise((s, f)=>{
+            conn.query("SELECT * FROM tb_contacts ORDER BY id", (err, result)=>{
+                if(err){
+                  f(err)
+                }else{
+                  console.log(result)
+                  s(result)
+                }
+            })
+        })
+    },
+
+    delete(id){
+        console.log("id ", id)
+        return new Promise((s, f)=>{
+          conn.query("DELETE FROM tb_contacts WHERE id = ?", [
+            id
+          ], (err, result) => {
+              if(err){
+                f(err)
+              }else{
+                s(result)
+              }
+            }
+          )
+        })
+      }
 }
