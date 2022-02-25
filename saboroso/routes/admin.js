@@ -81,10 +81,10 @@ router.post("/menus", function(req, res, next){
 })
 
 router.delete("/menus/:id", function(req, res, next){
-    reservations.delete(req.params.id).then(result=>{
+    menus.delete(req.params.id).then(result=>{
         res.send(result)
     }).catch(err=>{
-        console.error(err)
+        console.error("erro")
     })
 })
 

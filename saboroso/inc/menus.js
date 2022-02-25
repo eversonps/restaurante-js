@@ -50,6 +50,7 @@ module.exports = {
   },
 
   delete(id){
+    console.log("id ", id)
     return new Promise((s, f)=>{
       conn.query("DELETE FROM tb_menus WHERE id = ?", [
         id
