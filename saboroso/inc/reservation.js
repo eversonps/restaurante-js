@@ -1,5 +1,6 @@
 let conn = require("./db")
 const Pagination = require("./Pagination")
+var moment = require("moment")
 
 module.exports = {
 
@@ -89,4 +90,36 @@ module.exports = {
           )
         })
       },
+
+    chart(req){
+        return new Promise((s,f) =>{
+            conn.query(`
+            SELECT CONCAT(YEAR(date), '-', MONTH(date)) AS date, COUNT(*) AS total, SUM(people) / COUNT(*) AS avg_people
+            FROM tb_reservations
+            WHERE date BETWEEN ? AND ?
+            GROUP BY YEAR(date), MONTH(date)
+            ORDER BY YEAR(date), MONTH(date)
+        `,  [
+                req.query.start,
+                req.query.end
+            ], (err, result)=>{
+                if(err){
+                    f(err)
+                }else{
+                    let months = []
+                    let values = []
+
+                    result.forEach(row => {
+                        months.push(moment(row.date).format("MMM YYYY"))
+                        values.push(row.total)
+                    });
+
+                    s({
+                        months,
+                        values
+                    })
+                }
+            })
+        })
+    }
 }
