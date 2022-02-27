@@ -215,11 +215,15 @@
       switch(name){
         case "date":
           input.value = moment(data[name]).format("YYYY-MM-DD")
+          console.log(input.value)
           break
         default:
-          if(input) input.value = data[name]
+          if(input) {
+            input.value = data[name]
+            console.log(input.value)
+          }
           break
-      }
+      }      
     }
   })
 </script>

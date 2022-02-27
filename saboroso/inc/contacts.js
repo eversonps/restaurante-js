@@ -1,4 +1,4 @@
-const { resolveInclude } = require("ejs")
+
 var conn = require("./db")
 
 module.exports = {
@@ -29,7 +29,7 @@ module.exports = {
         })
     },
 
-    getMenus(){
+    getContacts(){
         return new Promise((s, f)=>{
             conn.query("SELECT * FROM tb_contacts ORDER BY id", (err, result)=>{
                 if(err){

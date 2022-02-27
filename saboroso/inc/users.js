@@ -1,3 +1,4 @@
+const req = require("express/lib/request")
 var conn = require("./db")
 
 module.exports = {
@@ -45,28 +46,38 @@ module.exports = {
         })
     },
   
-    save(fields, files){
+    save(fields){
       return new Promise((s, f)=>{
-        let query, params = [
-          fields.name,
-          fields.email
-        ]
-  
-        if(parseInt(fields.id) > 0){
-          params.push(fields.id)
-          query = `UPDATE tb_users SET name = ?, email = ? WHERE id = ?`
+        if(!fields.email || !fields.name){
+          f("Usuário não cadastrado. Preencha todos os campos")
         }else{
-            params.push(fields.password)
-            query = "INSERT INTO tb_users(name, email, password) VALUES (?, ?, ?)"
+          let query, params = [
+            fields.name,
+            fields.email
+          ]
+    
+          
+  
+          if(parseInt(fields.id) > 0){
+            params.push(fields.id)
+            query = `UPDATE tb_users SET name = ?, email = ? WHERE id = ?`
+          }else{
+              if(!fields.password){
+                f("Usuário não cadastrado. Preencha todos os campos")
+              }
+              params.push(fields.password)
+              query = "INSERT INTO tb_users(name, email, password) VALUES (?, ?, ?)"
+          }
+          
+          conn.query(query, params, (err, result)=>{
+            if(err){
+              f(err)
+            }else{
+              s(result)
+            }
+          })
         }
         
-        conn.query(query, params, (err, result)=>{
-          if(err){
-            f(err)
-          }else{
-            s(result)
-          }
-        })
       })
     },
   
@@ -83,6 +94,29 @@ module.exports = {
             }
           }
         )
+      })
+    },
+
+    changePassword(req){
+      return new Promise((s, f)=>{
+        if(!req.fields.password){
+          f("Preencha a senha")
+        }else if(!req.fields.passwordConfirm){
+          f("Confirme a senha")
+        }else if(req.fields.passwordConfirm != req.fields.password){
+          f("As senhas não estão iguais. Confirme a senha corretamente!")
+        }else{
+          conn.query("UPDATE tb_users SET password = ? WHERE id = ?", [
+            req.fields.password,
+            req.fields.id
+          ], (err, result) =>{
+            if(err){
+              f(err.message)
+            }else{
+              s(result)
+            }
+          })
+        }
       })
     }
 }

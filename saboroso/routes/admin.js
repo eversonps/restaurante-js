@@ -3,6 +3,8 @@ var router = express.Router()
 var users = require("./../inc/users")
 var admin = require("./../inc/admin")
 var menus = require("./../inc/menus")
+var contacts = require("./../inc/contacts")
+var emails = require("./../inc/emails")
 var reservations = require("./../inc/reservation")
 var moment = require("moment")
 moment.locale("pt-BR")
@@ -42,6 +44,7 @@ router.post("/login", function(req, res, next){
         users.render(req, res, "Preencha o campo senha")
     }else{
         users.login(req.body.email, req.body.password).then(user=>{
+            console.log(user)
             req.session.user = user
             res.redirect("/admin")
         }).catch(err=>{
@@ -74,12 +77,28 @@ router.delete("/contacts/:id", function(req, res, next){
     contacts.delete(req.params.id).then(results=>{
         res.send(results)
     }).catch(e=>{
-        console.error(e)
+        res.send({
+            error: e
+        })
     })
 })
 
 router.get("/emails", function(req, res, next){
-    res.render("admin/emails", admin.getParams(req))
+    emails.getEmails().then(data=>{
+        res.render("admin/emails", admin.getParams(req, {
+            data
+        }))
+    })
+})
+
+router.delete("/emails/:id", function(req, res, next){
+    emails.delete(req.params.id).then(results=>{
+        res.send(results)
+    }).catch(e=>{
+        res.send({
+            error: e
+        })
+    })
 })
 
 router.get("/menus", function(req, res, next){
@@ -96,7 +115,9 @@ router.post("/menus", function(req, res, next){
     menus.save(req.fields, req.files).then(result=>{
         res.send(result)
     }).catch(e=>{
-        console.error(e)
+        res.send({
+            error: e
+        })
     })
 })
 
@@ -104,7 +125,9 @@ router.delete("/menus/:id", function(req, res, next){
     menus.delete(req.params.id).then(result=>{
         res.send(result)
     }).catch(err=>{
-        console.error("erro")
+        res.send({
+            error: err
+        })
     })
 })
 
@@ -120,7 +143,9 @@ router.post("/reservations", function(req, res, next){
     reservations.save(req.fields, req.files).then(result=>{
         res.send(result)
     }).catch(e=>{
-        console.error(e)
+        res.send({
+            error: e
+        })
     })
 })
 
@@ -128,7 +153,9 @@ router.delete("/reservations/:id", function(req, res, next){
     reservations.delete(req.params.id).then(result=>{
         res.send(result)
     }).catch(err=>{
-        console.error(err)
+        res.send({
+            error: err
+        })
     })
 })
 
@@ -145,7 +172,21 @@ router.post("/users", function(req, res, next){
     users.save(req.fields).then(result=>{
         res.send(result)
     }).catch(err=>{
-        console.error(err)
+        console.log(err)
+        res.send({
+            error: err
+        })
+    })
+})
+
+router.post("/users/password-change", function(req, res, next){
+    console.log("req", req)
+    users.changePassword(req).then(result=>{
+        res.send(result)
+    }).catch(err=>{
+        res.send({
+            error: err
+        })
     })
 })
 
@@ -153,7 +194,9 @@ router.delete("/users/:id", function(req, res, next){
     users.delete(req.params.id).then(result=>{
         res.send(result)
     }).catch(err=>{
-        console.error(err)
+        res.send({
+            error: err
+        })
     })
 
 })

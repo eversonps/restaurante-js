@@ -1,9 +1,10 @@
 class HcodeGrid{
     constructor(configs){
 
-      configs.listeners = Object.assign({ 
+      configs.listeners = Object.assign({},{ 
         afterUpdateClick: (e)=>{
-          $(this.formUpdate).modal("show")
+          console.log("clicado")
+          $("#modal-update").modal("show")
         },
 
         afterDeleteClick: (e)=>{
@@ -37,7 +38,8 @@ class HcodeGrid{
           if(name != "password" && name != "register"){
             let input = form.querySelector(`[name=${name}]`)
             input.value = data[name]
-          }
+            console.log(input.value)
+          }   
         }
       }, configs)
 
@@ -49,7 +51,8 @@ class HcodeGrid{
 
     fireEvent(name, args){
       if(typeof this.options.listeners[name] === "function"){
-        typeof this.options.listeners[name].apply(this, args)
+        console.log(this.options.listeners[name])
+        this.options.listeners[name].apply(this, args)
       }
     }
 
@@ -58,36 +61,48 @@ class HcodeGrid{
         return (el.tagName.toUpperCase() === "TR")
       })
 
-      console.log(tr.dataset.row)
       return JSON.parse(tr.dataset.row)
     }
 
     initForms(){
-        this.formCreate = document.querySelector(this.options.formCreate)
-        this.formCreate.save().then(json=>{
-          this.fireEvent("afterFormCreate")
-        }).catch(err=>{
-          this.fireEvent("afterFormCreateError")
+      this.formCreate = document.querySelector(this.options.formCreate)
+
+      if(this.formCreate){
+        this.formCreate.save({
+          success: ()=>{
+            this.fireEvent("afterFormCreate")
+          },
+          failure: ()=>{
+            this.fireEvent("afterFormCreateError")
+          }
         })
+      }
       
-        this.formUpdate = document.querySelector(this.options.formUpdate);
-      
-        this.formUpdate.save().then(json=>{
-          this.fireEvent("afterFormUpdate")
-        }).catch(err=>{
-          this.fireEvent("afterFormUpdateError")
-        });
+    
+      this.formUpdate = document.querySelector(this.options.formUpdate);
+    
+      if(this.formUpdate){
+        this.formUpdate.save({
+          success: ()=>{
+            this.fireEvent("afterFormUpdate")
+          },
+          failure: ()=>{
+            this.fireEvent("afterFormUpdateError")
+          }
+        })
+      }   
     }
 
     btnUpdateClick(e){
-          this.fireEvent("beforeUpdateClick", [e])
-          let data = this.getTrData(e)
-          console.log(data)
-          for(let name in data){
-            this.options.onUpdateLoad(this.formUpdate, name, data)
-          }
-    
-          this.fireEvent("afterUpdateClick", [e])
+      console.log("UPDATE")
+      this.fireEvent("beforeUpdateClick", [e])
+      let data = this.getTrData(e)
+      console.log(data)
+      for(let name in data){
+        this.options.onUpdateLoad(this.formUpdate, name, data)
+      }
+ 
+      this.fireEvent("afterUpdateClick", [e])
     }
 
     btnDeleteClick(e){
@@ -108,21 +123,19 @@ class HcodeGrid{
     }
 
     initButtons(){
-      this.rows.forEach(row=>{
-        [...row.querySelectorAll(".btn")].forEach(btn=>{
-          btn.addEventListener("click", e=>{
-            
-
-            if(e.target.classList.contains(this.options.btnUpdate)){
-              this.btnUpdateClick(e)
-            } else if(e.target.classList.contains(this.options.btnDelete)){
-              this.btnDeleteClick(e)
-            }else{
-              console.log("entrou")
-              this.fireEvent("buttonClick", [e.target, this.getTrData(e), e])
-            }
-          })
+    this.rows.forEach(row=>{
+      [...row.querySelectorAll(".btn")].forEach(btn=>{
+        btn.addEventListener("click", e=>{           
+          if(e.target.classList.contains(this.options.btnUpdate)){
+            this.btnUpdateClick(e)
+          } else if(e.target.classList.contains(this.options.btnDelete)){
+            this.btnDeleteClick(e)
+          }else{
+            console.log("entrou")
+            this.fireEvent("buttonClick", [e.target, this.getTrData(e), e])
+          }
         })
-      });
-    }
+      })
+    });
+  }
 }
